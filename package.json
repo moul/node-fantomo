@@ -6,6 +6,10 @@
   "directories": {
     "example": "examples"
   },
+  "dependencies": {
+    "phantomjs": "1.9",
+    "phantom": "0.5"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
