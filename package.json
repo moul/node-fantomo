@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "phantomjs": "1.9",
-    "phantom": "0.5"
+    "phantom": "0.5",
+    "debug": "0.7"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

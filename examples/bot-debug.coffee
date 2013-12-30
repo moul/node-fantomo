@@ -3,6 +3,8 @@
 # clear terminal
 process.stdout.write '\u001B[2J\u001B[0;0f'
 
+debug = require('debug') 'fantomo:examples:bot-debug'
+
 Fantomo    = require '..'
 
 bot = new Fantomo
@@ -11,8 +13,11 @@ bot = new Fantomo
     verbose: true
 
 bot.on 'ready', ->
-  console.log 'bot is ready'
-  setTimeout (=> @open 'http://moul.github.io/'), 3000
+  debug 'bot is ready'
+  @open 'http://moul.github.io/'
 
-bot.on 'open', ->
-  console.log 'opened'
+bot.browser.on 'ready', ->
+  debug 'browser is ready'
+
+bot.browser.on 'open', (path) ->
+  debug "browser is open (#{path})"

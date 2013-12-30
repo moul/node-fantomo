@@ -1,3 +1,4 @@
+debug          = require('debug') 'fantomo:lib:browser'
 {EventEmitter} = require 'events'
 phantom        = require 'phantom'
 
@@ -10,15 +11,13 @@ class module.exports.Browser extends EventEmitter
     @options.excludeDomains ?= []
     @options.urlPrefix ?= ''
     @options.autoScreenshot ?= false
-    @debug 'init'
+    @options.referer ?= null
+    @options.cookies ?= []
+    debug 'init'
     @init fn
 
-  debug: (args...) =>
-    if @options.verbose
-      console.log "Browser>", args...
-
   evaluate: (script, fn, args...) =>
-    @debug 'Evaluating: ', script.toString().replace(/\n/g, ' ')[0...100] + '...'
+    debug 'Evaluating: ', script.toString().replace(/\n/g, ' ')[0...100] + '...'
     @page.evaluate script, fn, args...
 
   init: (fn = null) =>
@@ -32,37 +31,44 @@ class module.exports.Browser extends EventEmitter
         @page.set 'onResourceRequested', @onResourceRequested
         @page.set 'onResourceReceived',  @onResourceReceived
         @page.set 'settings.userAgent',  @options.userAgent
-        #@page.set 'Referer',             ''
-        #page.addCookie 'name', 'value', 'host', -> console.log 'cookie added'
+        if @options.referer
+          @page.set 'Referer',           @options.referer
+        for cookie in @options.cookies
+          @setCookie cookie
         @emit 'ready'
         do fn if fn
+
+  setCookie: (cookie = {}) =>
+    @page.addCookie cookie.name, cookie.value, cookie.host, =>
+      @emit 'cookie', cookie
+      @emit "cookie::#{cookie.name}", cookie
 
   onResourceRequested: (request) =>
     domain = request.url.split(/\//)[2]
     unless domain in @options.excludeDomains
-      @debug 'Skipping Resource', request.url
+      #debug 'Skipping Resource', request.url
       return false
-    #@debug 'ResourceRequest>', request.id, request.url
+    #debug 'ResourceRequest>', request.id, request.url
 
   onResourceReceive: (response) =>
-    @debug 'ResourceResponse>', response.id
+    debug 'ResourceResponse>', response.id
 
   onPageError: (msg, trace) =>
-    @debug 'Error> ', msg, trace
+    debug 'Error> ', msg, trace
 
   onPageConsoleMessage: (msg, line, source) =>
-    @debug 'Console> ', msg, line, source
+    debug 'Console> ', msg, line, source
 
   onPageAlert: (msg) =>
-    @debug  'Alert> ', msg
+    debug 'Alert> ', msg
 
   open: (path) =>
     url = "#{@options.urlPrefix}#{path}"
-    @debug "url", url
+    debug "open:url", url
     @page.open url, (status) =>
       return unless status
       @emit 'open', path
       @emit "open::#{path}"
-      @debug "opened status", status
+      debug "opened status", status
       if @options.autoScreenshot
         @page.render "last.png"
