@@ -60,7 +60,10 @@ class module.exports.Browser extends EventEmitter
     debug 'Error> ', msg, trace
 
   onPageConsoleMessage: (msg, line, source) =>
-    debug 'Console> ', msg, line, source
+    if line and source
+      debug 'Console> ', msg, line, source
+    else
+      debug 'Console> ', msg
 
   onPageAlert: (msg) =>
     debug 'Alert> ', msg
