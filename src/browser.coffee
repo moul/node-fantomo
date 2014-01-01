@@ -4,6 +4,7 @@ phantom        = require 'phantom'
 
 class module.exports.Browser extends EventEmitter
   constructor: (@options = {}, fn = (->)) ->
+    @ready = false
     @options.userAgent ?= 'NodeJS/Phantomo'
     @options.viewportSize ?= {width: 1546, height: 2048}
     @options.loadImages ?= false
@@ -31,10 +32,12 @@ class module.exports.Browser extends EventEmitter
         @page.set 'onResourceRequested', @onResourceRequested
         @page.set 'onResourceReceived',  @onResourceReceived
         @page.set 'settings.userAgent',  @options.userAgent
+        @page.set 'debug',        false
         if @options.referer
           @page.set 'Referer',           @options.referer
         for cookie in @options.cookies
           @setCookie cookie
+        @ready = true
         @emit 'ready'
         do fn if fn
 
@@ -64,11 +67,11 @@ class module.exports.Browser extends EventEmitter
 
   open: (path) =>
     url = "#{@options.urlPrefix}#{path}"
-    debug "open:url", url
+    debug "open", "url=#{url}"
     @page.open url, (status) =>
       return unless status
+      debug "open", "status=#{status}"
       @emit 'open', path
       @emit "open::#{path}"
-      debug "opened status", status
       if @options.autoScreenshot
         @page.render "last.png"
