@@ -24,3 +24,16 @@ class module.exports.Bot extends EventEmitter
       @on_open args... if @on_open?
 
     @open = @browser.open
+
+  inject: (code, args...) ->
+    switch typeof code
+      when 'function'
+        debug "Injecting inline function"
+        @browser.evaluate code, args...
+      when 'string'
+        browserify = require 'browserify'
+        b = browserify code
+        b.bundle (err, src) =>
+          @browser.evaluate src, args...
+      else
+        throw "Injected code must be filename, dirname or inline javascript code"
