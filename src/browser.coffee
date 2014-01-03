@@ -1,6 +1,8 @@
 debug          = require('debug') 'fantomo:lib:browser'
 {EventEmitter} = require 'events'
 phantom        = require 'phantom'
+require './patch'
+
 
 class module.exports.Browser extends EventEmitter
   constructor: (@options = {}, fn = (->)) ->
