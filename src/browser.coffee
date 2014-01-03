@@ -5,7 +5,7 @@ require './patch'
 
 
 class module.exports.Browser extends EventEmitter
-  constructor: (@options = {}, fn = (->)) ->
+  constructor: (@options={}, fn=(->)) ->
     @ready = false
     @options.userAgent ?= 'NodeJS/Phantomo'
     @options.viewportSize ?= {width: 1546, height: 2048}
@@ -23,7 +23,7 @@ class module.exports.Browser extends EventEmitter
     debug 'Evaluating: ', script.toString().replace(/\n/g, ' ')[0...100] + '...'
     @page.evaluate script, fn, args...
 
-  init: (fn = null) =>
+  init: (fn=null) =>
     phantom.create (@ph) =>
       @ph.createPage (@page) =>
         @page.set 'viewportSize',        @options.viewportSize
@@ -43,7 +43,7 @@ class module.exports.Browser extends EventEmitter
         @emit 'ready'
         do fn if fn
 
-  setCookie: (cookie = {}) =>
+  setCookie: (cookie={}) =>
     @page.addCookie cookie.name, cookie.value, cookie.host, =>
       @emit 'cookie', cookie
       @emit "cookie::#{cookie.name}", cookie
