@@ -32,8 +32,26 @@ class module.exports.Bot extends EventEmitter
         @browser.evaluate code, args...
       when 'string'
         browserify = require 'browserify'
-        b = browserify code
-        b.bundle (err, src) =>
-          @browser.evaluate src, args...
+        filepath = code
+
+        b = browserify filepath
+
+        opts = {}
+        opts.standalone = 'fantomo'
+        opts.debug = true
+
+        b.bundle opts, (err, src) =>
+          if err
+            console.error err
+            return
+
+          fn = (->
+            browserify = (PLACEHOLDER)
+            return fantomo arguments...
+            ).toString().replace('PLACEHOLDER', src)
+          eval "var fn = #{fn};"
+
+          @browser.evaluate fn, args...
+
       else
         throw "Injected code must be filename, dirname or inline javascript code"

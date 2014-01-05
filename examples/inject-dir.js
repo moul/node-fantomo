@@ -29,8 +29,13 @@
   });
 
   bot.browser.on('open', function(path) {
+    var callback;
+
     debug("browser is open (" + path + ")");
-    return bot.inject('./inject');
+    callback = function(ret) {
+      return console.log("callback: ret=" + ret);
+    };
+    return bot.inject('./inject/index', callback, 1, 2, 3);
   });
 
 }).call(this);

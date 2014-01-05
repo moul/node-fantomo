@@ -23,4 +23,8 @@ bot.browser.on 'ready', ->
 
 bot.browser.on 'open', (path) ->
   debug "browser is open (#{path})"
-  bot.inject './inject'
+
+  callback = (ret) ->
+    console.log "callback: ret=#{ret}"
+
+  bot.inject './inject/index', callback, 1, 2, 3

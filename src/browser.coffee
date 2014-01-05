@@ -1,6 +1,6 @@
 debug          = require('debug') 'fantomo:lib:browser'
 {EventEmitter} = require 'events'
-phantom        = require 'phantom'
+phantom = require 'phantom'
 require './patch'
 
 
@@ -19,9 +19,9 @@ class module.exports.Browser extends EventEmitter
     debug 'init'
     @init fn
 
-  evaluate: (script, fn, args...) =>
+  evaluate: (script, args...) =>
     debug 'Evaluating: ', script.toString().replace(/\n/g, ' ')[0...100] + '...'
-    @page.evaluate script, fn, args...
+    @page.evaluate script, args...
 
   init: (fn=null) =>
     phantom.create (@ph) =>

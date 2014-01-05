@@ -10,7 +10,10 @@
     var args;
 
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return console.log.apply(console, ['called with args: '].concat(__slice.call(args)));
+    console.log.apply(console, ['called with args: '].concat(__slice.call(args)));
+    return 47;
   };
+
+  return 46;
 
 }).call(this);
