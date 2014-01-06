@@ -1,35 +1,27 @@
 debug = require('debug') 'fantomo:lib:bot'
-
-{Browser}       = require './browser'
+{Browser} = require './browser'
 {EventEmitter} = require 'events'
+{cache_url} = require './utils'
 
-class module.exports.Bot extends EventEmitter
+
+class module.exports.Bot extends Browser
   constructor: (@options = {}) ->
-    @options.browser ?= {}
-    @options.verbose ?= false
-
     debug 'init'
+    @options.cache_dir ?= '/tmp'
+    do @init if @init?
+    super
 
-    @init @options if @init?
-
-    @browser = new Browser @options.browser
-
-    @browser.on 'ready', =>
-      debug 'ready'
-      @emit  'ready'
-      if @options.url?
-        @browser.open @options.url
-
-    @browser.on 'open', (args...) =>
-      @on_open args... if @on_open?
-
-    @open = @browser.open
+  cache_url: (url, fn) ->
+    opts =
+      url: url
+      dir: @options.cache_dir
+    cache_url opts, fn
 
   inject: (code, args...) ->
     switch typeof code
       when 'function'
         debug "Injecting inline function"
-        @browser.evaluate code, args...
+        @evaluate code, args...
       when 'string'
         browserify = require 'browserify'
         filepath = code
@@ -51,7 +43,7 @@ class module.exports.Bot extends EventEmitter
             ).toString().replace('PLACEHOLDER', src)
           eval "var fn = #{fn};"
 
-          @browser.evaluate fn, args...
+          @evaluate fn, args...
 
       else
         throw "Injected code must be filename, dirname or inline javascript code"

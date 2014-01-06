@@ -1,11 +1,11 @@
-debug          = require('debug') 'fantomo:lib:browser'
+debug = require('debug') 'fantomo:lib:browser'
 {EventEmitter} = require 'events'
 phantom = require 'phantom'
 require './patch'
 
 
 class module.exports.Browser extends EventEmitter
-  constructor: (@options={}, fn=(->)) ->
+  constructor: (@options={}, fn=null) ->
     @ready = false
     @options.userAgent ?= 'NodeJS/Phantomo'
     @options.viewportSize ?= {width: 1546, height: 2048}
@@ -16,14 +16,15 @@ class module.exports.Browser extends EventEmitter
     @options.autoScreenshot ?= false
     @options.referer ?= null
     @options.cookies ?= []
+    @options.url ?= null
     debug 'init'
-    @init fn
+    @initBrowser fn
 
   evaluate: (script, args...) =>
     debug 'Evaluating: ', script.toString().replace(/\n/g, ' ')[0...100] + '...'
     @page.evaluate script, args...
 
-  init: (fn=null) =>
+  initBrowser: (fn=null) =>
     phantom.create (@ph) =>
       @ph.createPage (@page) =>
         @page.set 'viewportSize',        @options.viewportSize
@@ -41,6 +42,8 @@ class module.exports.Browser extends EventEmitter
           @setCookie cookie
         @ready = true
         @emit 'ready'
+        if @options.url?
+          @open @options.url
         do fn if fn
 
   setCookie: (cookie={}) =>
